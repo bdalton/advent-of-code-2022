@@ -1,8 +1,8 @@
-use crate::{read_lines, AdventResult};
+use crate::read_input;
 use anyhow::{anyhow, Context};
 
-pub fn solution() -> AdventResult {
-    let input: Vec<Option<usize>> = read_lines("day01.txt")
+pub fn solution() -> anyhow::Result<(usize, usize)> {
+    let input: Vec<Option<usize>> = read_input("day01.txt")
         .context("reading input")?
         .iter()
         .enumerate()
@@ -30,7 +30,7 @@ pub fn solution() -> AdventResult {
         .ok_or_else(|| anyhow!("not enough elves"))?;
     let phase2_answer = suffix.iter().sum::<usize>();
 
-    Ok((phase1_answer.into(), phase2_answer.into()))
+    Ok((phase1_answer, phase2_answer))
 }
 
 /// blank lines are mapped to Ok(None) and lines with numbers to Some(n)

@@ -1,7 +1,7 @@
-use crate::{AdventResult, Answer};
 use anyhow::anyhow;
 use arrayvec::ArrayVec;
 use colored::Colorize;
+use std::fmt::Display;
 use std::str::{Chars, FromStr};
 
 pub struct Shell {
@@ -17,9 +17,11 @@ impl Shell {
         Self::default()
     }
 
-    pub fn solve<S>(&mut self, day_index: usize, solution: S) -> &mut Shell
+    pub fn solve<S, T, U>(&mut self, day_index: usize, solution: S) -> &mut Shell
     where
-        S: Fn() -> AdventResult,
+        S: Fn() -> anyhow::Result<(T, U)>,
+        T: Display,
+        U: Display,
     {
         self.emit_day_span(day_index);
         self.spacer();
@@ -28,9 +30,9 @@ impl Shell {
                 self.emit_error_span(e);
             }
             Ok((answer1, answer2)) => {
-                self.emit_answer_span("  phase 1: ", answer1);
+                self.emit_answer_span("  phase 1: ", answer1.to_string());
                 self.spacer();
-                self.emit_answer_span("  phase 2: ", answer2);
+                self.emit_answer_span("  phase 2: ", answer2.to_string());
                 println!();
             }
         }
@@ -50,12 +52,14 @@ impl Shell {
         );
     }
 
-    fn emit_error_span(&self, _e: anyhow::Error) {}
+    fn emit_error_span(&self, e: anyhow::Error) {
+        Self::span(e.to_string(), self.day_bg, self.day_fg);
+    }
 
-    fn emit_answer_span(&self, label: &'static str, answer: Answer) {
+    fn emit_answer_span(&self, label: &'static str, answer: String) {
         Self::span(label, self.answer_bg, self.label_fg);
         Self::span(
-            format!("  {:>12}  ", answer.to_string()),
+            format!("  {:>12}  ", answer),
             self.answer_bg,
             self.answer_fg,
         );

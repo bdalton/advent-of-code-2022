@@ -53,7 +53,19 @@ impl Shell {
     }
 
     fn emit_error_span(&self, e: anyhow::Error) {
-        Self::span(e.to_string(), self.day_bg, self.day_fg);
+        Self::span(format!(" {:<53} ", e.to_string()), self.day_bg, self.day_fg);
+        let mut it = e.source();
+        while let Some(inner) = it {
+            println!();
+            print!("           ");
+            Self::span(
+                format!(" {:<53} ", inner.to_string()),
+                self.day_bg,
+                self.day_fg,
+            );
+            it = inner.source();
+        }
+        println!();
     }
 
     fn emit_answer_span(&self, label: &'static str, answer: String) {
